@@ -27,6 +27,9 @@ if node['php-fpm']['package_name'].nil?
   else
     php_fpm_package_name = "php5-fpm"
   end
+  if platform?('ubuntu') and node['platform_version'].to_f >= 16.0
+    php_fpm_package_name = 'php-fpm'
+  end
 else
   php_fpm_package_name = node['php-fpm']['package_name']
 end
@@ -43,8 +46,12 @@ else
 end
 
 service_provider = nil
-if node['platform'] == 'ubuntu' and node['platform_version'].to_f >= 13.10
-  service_provider = ::Chef::Provider::Service::Upstart
+if node['platform'] == 'ubuntu'
+  if node['platform_version'].to_f >= 13.10 and node['platform_version'].to_f < 16.0
+    service_provider = ::Chef::Provider::Service::Upstart
+  elsif node['platform_version'].to_f >= 16.0
+    service_provider = ::Chef::Provider::Service::Systemd
+  end
 end
 
 directory node['php-fpm']['log_dir']

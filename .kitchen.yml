@@ -6,8 +6,10 @@ provisioner:
   name: chef_solo
 
 platforms:
+  - name: ubuntu-16.04
+  - name: ubuntu-14.04
   - name: ubuntu-12.04
-  - name: centos-6.4
+  - name: centos-6.7
   - name: fedora-21
 
 suites:
@@ -19,3 +21,17 @@ suites:
         pools:
           - name: web
             listen: '127.0.0.1:9081'
+  - name: php7
+    run_list:
+      - recipe[php-fpm-test]
+      - recipe[php-fpm::default]
+    attributes:
+      php-fpm:
+        pools:
+          - name: web
+            listen: '127.0.0.1:9081'
+    excludes:
+      - ubuntu-16.04
+      - ubuntu-12.04
+      - centos-6.7
+      - fedora-21

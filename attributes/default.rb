@@ -1,3 +1,6 @@
+
+# default['php']['version'] = '7.0'
+
 case node["platform_family"]
 when "rhel", "fedora"
   user = "apache"
@@ -7,18 +10,46 @@ when "rhel", "fedora"
   conf_file = "/etc/php-fpm.conf"
   error_log = "/var/log/php-fpm/error.log"
   pid = "/var/run/php-fpm/php-fpm.pid"
+  service_name = 'php-fpm'
+when 'debian'
+  if platform?('ubuntu')
+    if node['platform_version'].to_f >= 16.0
+      user = "www-data"
+      group = "www-data"
+      conf_dir = "/etc/php/7.0/fpm/conf.d"
+      pool_conf_dir = "/etc/php/7.0/fpm/pool.d"
+      conf_file = "/etc/php/7.0/fpm/php-fpm.conf"
+      error_log = "/var/log/php7.0-fpm.log"
+      pid ="/var/run/php/php7.0-fpm.pid"
+      service_name = "php7.0-fpm"
+    else
+      user = "www-data"
+      group = "www-data"
+      conf_dir = "/etc/php5/fpm/conf.d"
+      pool_conf_dir = "/etc/php5/fpm/pool.d"
+      if node['platform'] == "ubuntu" and node['platform_version'].to_f <= 10.04
+        conf_file = "/etc/php5/fpm/php5-fpm.conf"
+      else
+        conf_file = "/etc/php5/fpm/php-fpm.conf"
+      end
+      error_log = "/var/log/php5-fpm.log"
+      pid ="/var/run/php5-fpm.pid"
+      service_name = "php5-fpm"
+    end
+  end
 else
   user = "www-data"
   group = "www-data"
   conf_dir = "/etc/php5/fpm/conf.d"
   pool_conf_dir = "/etc/php5/fpm/pool.d"
-  if node.platform == "ubuntu" and node.platform_version.to_f <= 10.04
+  if node['platform'] == "ubuntu" and node['platform_version'].to_f <= 10.04
     conf_file = "/etc/php5/fpm/php5-fpm.conf"
   else
     conf_file = "/etc/php5/fpm/php-fpm.conf"
   end
   error_log = "/var/log/php5-fpm.log"
   pid ="/var/run/php5-fpm.pid"
+  service_name = 'php-fpm'
 end
 
 default['php-fpm']['user'] = user
@@ -27,6 +58,7 @@ default['php-fpm']['conf_dir'] = conf_dir
 default['php-fpm']['pool_conf_dir'] = pool_conf_dir
 default['php-fpm']['conf_file'] = conf_file
 default['php-fpm']['pid'] = pid
+default['php-fpm']['service_name'] = service_name
 default['php-fpm']['log_dir'] = '/var/log/php-fpm'
 default['php-fpm']['error_log'] =  error_log
 default['php-fpm']['log_level'] = "notice"

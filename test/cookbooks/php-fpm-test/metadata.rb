@@ -1,0 +1,7 @@
+name             'php-fpm-test'
+maintainer       'YOUR_NAME'
+maintainer_email 'YOUR_EMAIL'
+license          'All rights reserved'
+description      'Installs/Configures php-fpm-test'
+long_description 'Installs/Configures php-fpm-test'
+version          '0.1.0'
